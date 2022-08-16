@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-// TODO: Hacer que al generar valores aleatorios sean diferentes para todas las
-// matrices
-
 void mostrarMatriz(int filas, int columnas, int matriz[filas][columnas]) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
@@ -29,10 +26,9 @@ void multiplicarMatrices(int filas, int columnas, int a[filas][columnas],
 
 void asignarValoresAleatoriosMatriz(int filas, int columnas,
                                     int matriz[filas][columnas]) {
-  srand(time(NULL));
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
-      matriz[fila][columna] = rand() % 20;
+      matriz[fila][columna] = rand() % 50;
     }
   }
 }
@@ -58,12 +54,11 @@ int main() {
   int matrizB[filas][columnas];
   int resultado[filas][columnas];
 
-  asignarValoresMatriz(filas, columnas, matrizA);
-  asignarValoresMatriz(filas, columnas, matrizB);
+  asignarValoresAleatoriosMatriz(filas, columnas, matrizA);
+  asignarValoresAleatoriosMatriz(filas, columnas, matrizB);
   multiplicarMatrices(filas, columnas, matrizA, matrizB, resultado);
 
   mostrarMatriz(filas, columnas, matrizA);
   mostrarMatriz(filas, columnas, matrizB);
   mostrarMatriz(filas, columnas, resultado);
-  // mostrarMatriz(filas, columnas, resultado);
 }
