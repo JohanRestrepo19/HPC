@@ -1,52 +1,69 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-// TODO: 1. Hacer parametrizable el el tamaño de las matrices.
-// TODO: 2. Generar valores aleatorios para las matrices.
+// TODO: Hacer que al generar valores aleatorios sean diferentes para todas las
+// matrices
 
-void display(int filas, int columnas, int matriz[filas][columnas]) {
+void mostrarMatriz(int filas, int columnas, int matriz[filas][columnas]) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
       printf("%d\t", matriz[fila][columna]);
     }
     printf("\n");
   }
+  printf("\n");
 }
 
-//
-// void multiply(int a[FILAS_MATRIZ_A][COLUMNAS_MATRIZ_A],
-//               int b[FILAS_MATRIZ_B][COLUMNAS_MATRIZ_B],
-//               int result[FILAS_MATRIZ_B][COLUMNAS_MATRIZ_A]) {
-//   for (int fila = 0; fila < FILAS_MATRIZ_B; fila++) {
-//     for (int columna = 0; columna < COLUMNAS_MATRIZ_A; columna++) {
-//       result[fila][columna] = 0;
-//       for (int i = 0; i < COLUMNAS_MATRIZ_A; i++) {
-//         result[fila][columna] += a[fila][i] * b[i][columna];
-//       }
-//     }
-//   }
-// }
+void multiplicarMatrices(int filas, int columnas, int a[filas][columnas],
+                         int b[filas][columnas], int result[filas][columnas]) {
+  for (int fila = 0; fila < filas; fila++) {
+    for (int columna = 0; columna < columnas; columna++) {
+      result[fila][columna] = 0;
+      for (int i = 0; i < columnas; i++) {
+        result[fila][columna] += a[fila][i] * b[i][columna];
+      }
+    }
+  }
+}
 
-void generarMatriz(int filas, int columnas) {
-  printf("filas: %d columnas: %d\n", filas, columnas);
+void asignarValoresAleatoriosMatriz(int filas, int columnas,
+                                    int matriz[filas][columnas]) {
+  srand(time(NULL));
+  for (int fila = 0; fila < filas; fila++) {
+    for (int columna = 0; columna < columnas; columna++) {
+      matriz[fila][columna] = rand() % 20;
+    }
+  }
+}
+
+void asignarValoresMatriz(int filas, int columnas,
+                          int matriz[filas][columnas]) {
+  for (int fila = 0; fila < filas; fila++) {
+    printf("Valores fila [%i]\n", (fila + 1));
+    for (int columna = 0; columna < columnas; columna++) {
+      scanf("%i", &matriz[fila][columna]);
+    }
+  }
 }
 
 int main() {
-  int n;
-  printf("Ingrese el valor de N: \n");
-  scanf("%d", &n);
-  generarMatriz(n, n);
-  // int a[3][3] = {
-  //     {1, 2, 3},
-  //     {1, 1, 1},
-  //     {0, 1, -1},
-  // };
-  // int b[FILAS_MATRIZ_B][COLUMNAS_MATRIZ_B] = {
-  //     {1},
-  //     {2},
-  //     {1},
-  // };
-  // int c[FILAS_MATRIZ_B][COLUMNAS_MATRIZ_A];
+  int n, filas, columnas;
 
-  // multiply(a, b, c);
-  return 0;
+  printf("Ingrese la cantidad de filas: \n");
+  scanf("%i", &n);
+  filas = columnas = n;
+
+  int matrizA[filas][columnas];
+  int matrizB[filas][columnas];
+  int resultado[filas][columnas];
+
+  asignarValoresMatriz(filas, columnas, matrizA);
+  asignarValoresMatriz(filas, columnas, matrizB);
+  multiplicarMatrices(filas, columnas, matrizA, matrizB, resultado);
+
+  mostrarMatriz(filas, columnas, matrizA);
+  mostrarMatriz(filas, columnas, matrizB);
+  mostrarMatriz(filas, columnas, resultado);
+  // mostrarMatriz(filas, columnas, resultado);
 }
