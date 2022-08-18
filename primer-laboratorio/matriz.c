@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+// TODO: Replantear el codigo para que funcione con vectores planos
+// TODO: Implementar paralelismo del codigo hacinedo uso de los hilos con
+// PThreads
+
 void mostrarMatriz(int filas, int columnas, int matriz[filas][columnas]) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
