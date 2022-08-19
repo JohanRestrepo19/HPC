@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+// NOTE: 835 es el maximo numero de filas que acepta la implementación
+// secuencial de la multiplicacion de matrices a partir de 836 el programa
+// presenta un segmentation fault (core dumped)
+
 // TODO: Replantear el codigo para que funcione con vectores planos
 // TODO: Implementar paralelismo del codigo hacinedo uso de los hilos con
 // PThreads
