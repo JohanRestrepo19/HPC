@@ -6,7 +6,6 @@
 // secuencial de la multiplicacion de matrices a partir de 836 el programa
 // presenta un segmentation fault (core dumped)
 
-// TODO: Hacer el código parametrizable desde la llamada al ejecutable
 // TODO: Replantear el codigo para que funcione con vectores planos
 // TODO: Implementar paralelismo del codigo hacinedo uso de los hilos con
 // PThreads
@@ -55,9 +54,9 @@ void asignarValoresMatriz(int filas, int columnas,
 int main(int argc, char *argv[]) {
 
   int n, filas, columnas;
+  n = atoi(argv[1]);
 
-  printf("Ingrese la cantidad de filas: \n");
-  scanf("%i", &n);
+  printf("El numero de filas es: %i\n", n);
   filas = columnas = n;
 
   int matrizA[filas][columnas];
