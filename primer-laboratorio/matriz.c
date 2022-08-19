@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -10,12 +11,12 @@
 // TODO: Implementar paralelismo del codigo hacinedo uso de los hilos con
 // PThreads
 
-void mostrarMatriz(int filas, int columnas, int matriz[filas][columnas]) {
-  for (int fila = 0; fila < filas; fila++) {
-    for (int columna = 0; columna < columnas; columna++) {
-      printf("%d\t", matriz[fila][columna]);
-    }
-    printf("\n");
+void mostrarMatriz(int n, int cantElementos, int matriz[cantElementos]) {
+  for (int elemento = 0; elemento < cantElementos; elemento++) {
+    if ((elemento % n) == 0)
+      printf("\n");
+
+    printf("%d\t", matriz[elemento]);
   }
   printf("\n");
 }
@@ -32,12 +33,10 @@ void multiplicarMatrices(int filas, int columnas, int a[filas][columnas],
   }
 }
 
-void asignarValoresAleatoriosMatriz(int filas, int columnas,
-                                    int matriz[filas][columnas]) {
-  for (int fila = 0; fila < filas; fila++) {
-    for (int columna = 0; columna < columnas; columna++) {
-      matriz[fila][columna] = rand() % 50;
-    }
+void asignarValoresAleatoriosMatriz(int cantidadElementos,
+                                    int matriz[cantidadElementos]) {
+  for (int i = 0; i < cantidadElementos; i++) {
+    matriz[i] = rand() % 200;
   }
 }
 
@@ -53,21 +52,31 @@ void asignarValoresMatriz(int filas, int columnas,
 
 int main(int argc, char *argv[]) {
 
-  int n, filas, columnas;
+  srand(time(0));
+  int n, filas, columnas, cantidadElementos;
   n = atoi(argv[1]);
+  cantidadElementos = (int)pow((double)n, 2.0);
 
   printf("El numero de filas es: %i\n", n);
   filas = columnas = n;
 
-  int matrizA[filas][columnas];
-  int matrizB[filas][columnas];
-  int resultado[filas][columnas];
+  // int matrizA[filas][columnas];
+  // int matrizB[filas][columnas];
+  // int resultado[filas][columnas];
 
-  asignarValoresAleatoriosMatriz(filas, columnas, matrizA);
-  asignarValoresAleatoriosMatriz(filas, columnas, matrizB);
-  multiplicarMatrices(filas, columnas, matrizA, matrizB, resultado);
+  // asignarValoresAleatoriosMatriz(filas, columnas, matrizA);
+  // asignarValoresAleatoriosMatriz(filas, columnas, matrizB);
+  // multiplicarMatrices(filas, columnas, matrizA, matrizB, resultado);
 
-  mostrarMatriz(filas, columnas, matrizA);
-  mostrarMatriz(filas, columnas, matrizB);
-  mostrarMatriz(filas, columnas, resultado);
+  // mostrarMatriz(filas, columnas, matrizA);
+  // mostrarMatriz(filas, columnas, matrizB);
+  // mostrarMatriz(filas, columnas, resultado);
+  int matrizA[cantidadElementos];
+  int matrizB[cantidadElementos];
+
+  asignarValoresAleatoriosMatriz(cantidadElementos, matrizA);
+  mostrarMatriz(n, cantidadElementos, matrizA);
+
+  asignarValoresAleatoriosMatriz(cantidadElementos, matrizB);
+  mostrarMatriz(n, cantidadElementos, matrizB);
 }
