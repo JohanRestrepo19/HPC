@@ -10,9 +10,17 @@
 // TODO: Implementar paralelismo del codigo hacinedo uso de los hilos con
 // PThreads
 
-void mostrarMatriz(int n, int cantidadElementos, int matriz[n * n]) {
+void asignarValoresAleatoriosMatriz(int filas, int *matriz) {
+  int cantidadElementos = filas * filas;
+  for (int i = 0; i < cantidadElementos; i++) {
+    matriz[i] = rand() % 20;
+  }
+}
+
+void mostrarMatriz(int filas, int *matriz) {
+  int cantidadElementos = filas * filas;
   for (int elemento = 0; elemento < cantidadElementos; elemento++) {
-    if ((elemento % n) == 0)
+    if ((elemento % filas) == 0)
       printf("\n");
 
     printf("%d\t", matriz[elemento]);
@@ -32,37 +40,21 @@ void multiplicarMatrices(int filas, int columnas, int a[filas][columnas],
   }
 }
 
-void asignarValoresAleatoriosMatriz(int cantidadElementos,
-                                    int matriz[cantidadElementos]) {
-  for (int i = 0; i < cantidadElementos; i++) {
-    matriz[i] = rand() % 20;
-  }
-}
-
-void asignarValoresMatriz(int filas, int columnas,
-                          int matriz[filas][columnas]) {
-  for (int fila = 0; fila < filas; fila++) {
-    printf("Valores fila [%i]\n", (fila + 1));
-    for (int columna = 0; columna < columnas; columna++) {
-      scanf("%i", &matriz[fila][columna]);
-    }
-  }
-}
-
 int main(int argc, char *argv[]) {
-
   srand(time(0));
-  int n, cantidadElementos;
-  n = atoi(argv[1]);
 
-  printf("El numero de filas es: %i\n", n);
+  int filas, cantidadElementos, *matrizA, *matrizB;
+  filas = atoi(argv[1]);
+  cantidadElementos = filas * filas;
 
-  int matrizA[cantidadElementos];
-  int matrizB[cantidadElementos];
+  printf("El numero de filas es: %i\n", filas);
 
-  asignarValoresAleatoriosMatriz(cantidadElementos, matrizA);
-  mostrarMatriz(n, n * n, matrizA);
+  matrizA = (int *)malloc(cantidadElementos * sizeof(int));
+  matrizB = (int *)malloc(cantidadElementos * sizeof(int));
 
-  asignarValoresAleatoriosMatriz(cantidadElementos, matrizB);
-  mostrarMatriz(n, n * n, matrizB);
+  asignarValoresAleatoriosMatriz(filas, matrizA);
+  asignarValoresAleatoriosMatriz(filas, matrizB);
+
+  mostrarMatriz(filas, matrizA);
+  mostrarMatriz(filas, matrizB);
 }
