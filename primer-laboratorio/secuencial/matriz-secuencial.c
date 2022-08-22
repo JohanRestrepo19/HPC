@@ -2,28 +2,23 @@
 #include <stdlib.h>
 #include <time.h>
 
-// NOTE: 835 es el maximo numero de filas que acepta la implementación
-// secuencial de la multiplicacion de matrices a partir de 836 el programa
-// presenta un segmentation fault (core dumped)
-
-// TODO: Replantear el codigo para que funcione con vectores planos
-
 int **mallocArreglo2dEnteros(int filas, int columnas) {
-  int **punteroPunteroEntero;
-  punteroPunteroEntero = (int **)malloc(filas * sizeof(int *));
+  int **doblePunteroEntero;
+  doblePunteroEntero = (int **)malloc(filas * sizeof(int *));
 
   for (int fila = 0; fila < filas; fila++) {
-    punteroPunteroEntero[fila] = (int *)malloc(columnas * sizeof(int));
+    doblePunteroEntero[fila] = (int *)malloc(columnas * sizeof(int));
   }
 
-  return punteroPunteroEntero;
+  return doblePunteroEntero;
 }
 
-void liberarArreglo2dEnteros(int **ipp, int filas, int columnas) {
+void liberarArreglo2dEnteros(int **doblePunteroEntero, int filas,
+                             int columnas) {
   for (int fila = 0; fila < filas; fila++) {
-    free(ipp[fila]);
+    free(doblePunteroEntero[fila]);
   }
-  free(ipp);
+  free(doblePunteroEntero);
 }
 
 void asignarValoresAleatoriosMatriz(int filas, int columnas, int **matriz) {
@@ -59,6 +54,8 @@ void multiplicarMatrices(int filas, int columnas, int **matrizA, int **matrizB,
 
 int main(int argc, char *argv[]) {
   srand(time(0));
+  double tiempoEjecucion = 0.0;
+  clock_t inicio = clock();
 
   int filas, **matrizA, **matrizB, **resultado;
   filas = atoi(argv[1]);
@@ -71,14 +68,15 @@ int main(int argc, char *argv[]) {
   asignarValoresAleatoriosMatriz(filas, filas, matrizB);
   multiplicarMatrices(filas, filas, matrizA, matrizB, resultado);
 
-  printf("matriz A\n");
-  mostrarMatriz(filas, filas, matrizA);
-  printf("matriz B\n");
-  mostrarMatriz(filas, filas, matrizB);
-  printf("matriz Resultado\n");
-  mostrarMatriz(filas, filas, resultado);
-
   liberarArreglo2dEnteros(matrizA, filas, filas);
   liberarArreglo2dEnteros(matrizB, filas, filas);
   liberarArreglo2dEnteros(resultado, filas, filas);
+
+  clock_t final = clock();
+
+  tiempoEjecucion = (double)(final - inicio) / CLOCKS_PER_SEC;
+
+  printf("Multiplicando matrices de %i x %i\n", filas, filas);
+  printf("Tiempo de ejecución: %f\n", tiempoEjecucion);
+  printf("\n");
 }
