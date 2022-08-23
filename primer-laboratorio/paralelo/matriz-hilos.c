@@ -3,14 +3,11 @@
 #include <stdlib.h>
 #include <time.h>
 
-struct thread_data {
-  int filas;
-  int columnas;
-  int desde;
-  int hasta;
-};
-
 int **MATRIZ_A, **MATRIZ_B, **RESULTADO;
+
+struct informacionHilo {
+  int filas, columnas, cantidadHilos, indexHilo;
+};
 
 int **mallocArreglo2dEnteros(int filas, int columnas) {
   int **doblePunteroEntero;
@@ -50,84 +47,87 @@ void mostrarMatriz(int filas, int columnas, int **matriz) {
 }
 
 void *multiplicarMatrices(void *threadarg) {
+  struct informacionHilo *infoHilo;
+  int filas, columnas, cantidadHilos, indexHilo, fila, columna, i, desde, hasta;
 
-  struct thread_data *myData;
-  int desde, hasta, filas, columnas;
-  myData = (struct thread_data *)threadarg;
+  // Recuperación de la información que se manda encapsulada en el argumento
+  infoHilo = (struct informacionHilo *)threadarg;
+  filas = infoHilo->filas;
+  columnas = infoHilo->columnas;
+  cantidadHilos = infoHilo->cantidadHilos;
+  indexHilo = infoHilo->indexHilo;
 
-  filas = myData->filas;
-  columnas = myData->columnas;
-  desde = myData->desde;
-  hasta = myData->hasta;
+  // calculo de filas a trabar por el hilo
+  desde = indexHilo * filas / cantidadHilos;
+  hasta = (indexHilo + 1) * filas / cantidadHilos;
 
-  for (int fila = desde; fila < hasta; fila++) {
-    for (int columna = 0; columna < columnas; columna++) {
+  // Implementación de la función de multiplicación
+  for (fila = desde; fila < hasta; fila++) {
+    for (columna = 0; columna < columnas; columna++) {
       RESULTADO[fila][columna] = 0;
-      for (int i = 0; i < columnas; i++) {
-        RESULTADO[fila][columna] += MATRIZ_A[fila][i] * MATRIZ_B[i][columna];
-      }
+      printf("Estoy aqui\n");
+      // for (i = 0; i < columnas; i++) {
+      //   RESULTADO[fila][columna] += MATRIZ_A[fila][i] * MATRIZ_B[i][columna];
+      // }
     }
   }
   pthread_exit(NULL);
 }
 
 int main(int argc, char *argv[]) {
-  clock_t inicio = clock();
-
-  double tiempoEjecucion = 0.0;
+  clock_t inicioEjecucion = clock();
+  // Semilla para la generación de numeros aleatorios
   srand(time(0));
 
-  int filas = atoi(argv[1]);
-  int nroHilos = atoi(argv[2]);
-  pthread_t hilos[nroHilos];
-  int rc;
+  double tiempoEjecucion = 0.0;
+  int filas, columnas, cantidadHilos, indexHilo;
+  pthread_t hilos[cantidadHilos];
 
-  MATRIZ_A = mallocArreglo2dEnteros(filas, filas);
-  MATRIZ_B = mallocArreglo2dEnteros(filas, filas);
-  RESULTADO = mallocArreglo2dEnteros(filas, filas);
+  filas = atoi(argv[1]);
+  cantidadHilos = atoi(argv[2]);
+  columnas = filas;
 
-  asignarValoresAleatoriosMatriz(filas, filas, MATRIZ_A);
-  asignarValoresAleatoriosMatriz(filas, filas, MATRIZ_B);
+  MATRIZ_A = mallocArreglo2dEnteros(filas, columnas);
+  MATRIZ_B = mallocArreglo2dEnteros(filas, columnas);
+  RESULTADO = mallocArreglo2dEnteros(filas, columnas);
 
-  for (int indexHilo = 0; indexHilo < nroHilos; indexHilo++) {
-    struct thread_data infoHilo;
-    infoHilo.columnas = filas;
+  asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_A);
+  asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_B);
+
+  printf("Matriz A\n");
+  mostrarMatriz(filas, columnas, MATRIZ_A);
+  printf("Matriz B\n");
+  mostrarMatriz(filas, columnas, MATRIZ_B);
+  // Creacion de los hilos
+  for (indexHilo = 0; indexHilo < cantidadHilos; indexHilo++) {
+    // NOTE: Posible solución: crear la estructura de tipo puntero
+    struct informacionHilo infoHilo;
+    infoHilo.indexHilo = indexHilo;
+    infoHilo.cantidadHilos = cantidadHilos;
+    infoHilo.columnas = columnas;
     infoHilo.filas = filas;
-    infoHilo.desde = (indexHilo * filas) / nroHilos;
-    infoHilo.hasta = ((indexHilo + 1) * filas) / nroHilos;
 
-    rc = pthread_create(&hilos[indexHilo], NULL, multiplicarMatrices,
-                        (void *)&infoHilo);
-
-    if (rc) {
-      printf("ERROR; el codigo de retorno desde pthread_create() is %d \n", rc);
+    // TODO: Implementar el paso de argumentos utilizando un array, ver el
+    // ejemplo de la pagina hpc-tutorials llnl
+    if (pthread_create(&hilos[indexHilo], NULL, multiplicarMatrices,
+                       (void *)&infoHilo) != 0) {
+      printf("Hubo un error al crear el hilo\n");
       exit(-1);
     }
   }
 
-  for (int indexHilo = 0; indexHilo < nroHilos; indexHilo++) {
-    rc = pthread_join(hilos[indexHilo], NULL);
-    if (rc) {
-      printf("ERROR; el codigo de retorno desde pthread_join() is %d \n", rc);
+  // Hacer el join de los hilos
+  for (indexHilo = 0; indexHilo < cantidadHilos; indexHilo++) {
+    if (pthread_join(hilos[indexHilo], NULL)) {
+      printf("Hubo un error al crear el hilo\n");
       exit(-1);
     }
   }
 
-  pthread_exit(NULL);
+  printf("Resultado\n");
+  mostrarMatriz(filas, columnas, RESULTADO);
 
-  mostrarMatriz(filas, filas, MATRIZ_A);
-  mostrarMatriz(filas, filas, MATRIZ_B);
-  mostrarMatriz(filas, filas, RESULTADO);
+  // Liberar la memoria
 
-  liberarArreglo2dEnteros(MATRIZ_A, filas, filas);
-  liberarArreglo2dEnteros(MATRIZ_B, filas, filas);
-  liberarArreglo2dEnteros(RESULTADO, filas, filas);
-
-  clock_t final = clock();
-
-  tiempoEjecucion = (double)(final - inicio) / CLOCKS_PER_SEC;
-
-  printf("Multiplicando matrices de %i x %i\n", filas, filas);
-  printf("Tiempo de ejecución: %f\n", tiempoEjecucion);
-  printf("\n");
+  // Tomar el tiempo de ejecución
 }
