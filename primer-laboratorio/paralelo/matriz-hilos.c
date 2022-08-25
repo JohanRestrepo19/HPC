@@ -95,11 +95,6 @@ int main(int argc, char *argv[]) {
   asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_A);
   asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_B);
 
-  // printf("Matriz A\n");
-  // mostrarMatriz(filas, columnas, MATRIZ_A);
-  // printf("Matriz B\n");
-  // mostrarMatriz(filas, columnas, MATRIZ_B);
-  // Creacion de los hilos
   for (indexHilo = 0; indexHilo < cantidadHilos; indexHilo++) {
     // NOTE: Posible solución: crear la estructura de tipo puntero
     infoHilos[indexHilo].indexHilo = indexHilo;
@@ -122,9 +117,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // printf("Resultado\n");
-  // mostrarMatriz(filas, columnas, RESULTADO);
-
   // Liberar la memoria
   liberarArreglo2dEnteros(MATRIZ_A, filas, columnas);
   liberarArreglo2dEnteros(MATRIZ_B, filas, columnas);
@@ -132,10 +124,11 @@ int main(int argc, char *argv[]) {
 
   // Tomar el tiempo de ejecución
   gettimeofday(&final, NULL);
-  double timepoEjecucion;
-  timepoEjecucion = (final.tv_sec - inicio.tv_sec);
+  double tiempoEjecucion;
+  tiempoEjecucion =
+      (final.tv_sec - inicio.tv_sec) + 1e-6 * (final.tv_usec - inicio.tv_usec);
 
   printf("Multiplicando matrices de %i x %i\n", filas, columnas);
-  printf("Tiempo de ejecución: %f\n", timepoEjecucion);
+  printf("Tiempo de ejecución: %f\n", tiempoEjecucion);
   printf("\n");
 }
