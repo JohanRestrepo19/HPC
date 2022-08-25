@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
 
 int **MATRIZ_A, **MATRIZ_B, **RESULTADO;
@@ -31,7 +32,7 @@ void liberarArreglo2dEnteros(int **doblePunteroEntero, int filas,
 void asignarValoresAleatoriosMatriz(int filas, int columnas, int **matriz) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
-      matriz[fila][columna] = rand() % 20;
+      matriz[fila][columna] = (rand() % 20) + 1;
     }
   }
 }
@@ -74,11 +75,11 @@ void *multiplicarMatrices(void *threadarg) {
 }
 
 int main(int argc, char *argv[]) {
-  clock_t inicioEjecucion = clock();
   // Semilla para la generación de numeros aleatorios
   srand(time(0));
+  struct timeval inicio, final;
+  gettimeofday(&inicio, NULL);
 
-  double tiempoEjecucion = 0.0;
   int filas, columnas, cantidadHilos, indexHilo;
   struct informacionHilo infoHilos[cantidadHilos];
   pthread_t hilos[cantidadHilos];
@@ -94,10 +95,10 @@ int main(int argc, char *argv[]) {
   asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_A);
   asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_B);
 
-  printf("Matriz A\n");
-  mostrarMatriz(filas, columnas, MATRIZ_A);
-  printf("Matriz B\n");
-  mostrarMatriz(filas, columnas, MATRIZ_B);
+  // printf("Matriz A\n");
+  // mostrarMatriz(filas, columnas, MATRIZ_A);
+  // printf("Matriz B\n");
+  // mostrarMatriz(filas, columnas, MATRIZ_B);
   // Creacion de los hilos
   for (indexHilo = 0; indexHilo < cantidadHilos; indexHilo++) {
     // NOTE: Posible solución: crear la estructura de tipo puntero
@@ -106,8 +107,6 @@ int main(int argc, char *argv[]) {
     infoHilos[indexHilo].columnas = columnas;
     infoHilos[indexHilo].filas = filas;
 
-    // TODO: Implementar el paso de argumentos utilizando un array, ver el
-    // ejemplo de la pagina hpc-tutorials llnl
     if (pthread_create(&hilos[indexHilo], NULL, multiplicarMatrices,
                        (void *)&infoHilos[indexHilo]) != 0) {
       printf("Hubo un error al crear el hilo\n");
@@ -123,19 +122,20 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  printf("Resultado\n");
-  mostrarMatriz(filas, columnas, RESULTADO);
+  // printf("Resultado\n");
+  // mostrarMatriz(filas, columnas, RESULTADO);
 
   // Liberar la memoria
-  // liberarArreglo2dEnteros(MATRIZ_A, filas, columnas);
-  // liberarArreglo2dEnteros(MATRIZ_B, filas, columnas);
-  // liberarArreglo2dEnteros(RESULTADO, filas, columnas);
+  liberarArreglo2dEnteros(MATRIZ_A, filas, columnas);
+  liberarArreglo2dEnteros(MATRIZ_B, filas, columnas);
+  liberarArreglo2dEnteros(RESULTADO, filas, columnas);
 
   // Tomar el tiempo de ejecución
-  clock_t finalEjecucion = clock();
-  //
-  tiempoEjecucion = (double)(finalEjecucion - inicioEjecucion) / CLOCKS_PER_SEC;
-  printf("Multiplicando matrices de %i x %i\n", filas, filas);
-  printf("Tiempo de ejecución: %f\n", tiempoEjecucion);
+  gettimeofday(&final, NULL);
+  double timepoEjecucion;
+  timepoEjecucion = (final.tv_sec - inicio.tv_sec);
+
+  printf("Multiplicando matrices de %i x %i\n", filas, columnas);
+  printf("Tiempo de ejecución: %f\n", timepoEjecucion);
   printf("\n");
 }
