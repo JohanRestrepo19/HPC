@@ -24,7 +24,7 @@ void liberarArreglo2dEnteros(int **doblePunteroEntero, int filas,
 void asignarValoresAleatoriosMatriz(int filas, int columnas, int **matriz) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
-      matriz[fila][columna] = rand() % 20;
+      matriz[fila][columna] = (rand() % 1000) + 1;
     }
   }
 }

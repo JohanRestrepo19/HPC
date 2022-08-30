@@ -32,7 +32,7 @@ void liberarArreglo2dEnteros(int **doblePunteroEntero, int filas,
 void asignarValoresAleatoriosMatriz(int filas, int columnas, int **matriz) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
-      matriz[fila][columna] = (rand() % 20) + 1;
+      matriz[fila][columna] = (rand() % 1000) + 1;
     }
   }
 }
@@ -58,7 +58,7 @@ void *multiplicarMatrices(void *threadarg) {
   cantidadHilos = infoHilo->cantidadHilos;
   indexHilo = infoHilo->indexHilo;
 
-  // calculo de filas a trabar por el hilo
+  // calculo de filas a trabajar por el hilo
   desde = indexHilo * filas / cantidadHilos;
   hasta = (indexHilo + 1) * filas / cantidadHilos;
 
@@ -75,8 +75,9 @@ void *multiplicarMatrices(void *threadarg) {
 }
 
 int main(int argc, char *argv[]) {
-  // Semilla para la generación de numeros aleatorios
+  // Semilla para la generacion de numeros aleatorios
   srand(time(0));
+
   struct timeval inicio, final;
   gettimeofday(&inicio, NULL);
 
@@ -96,7 +97,6 @@ int main(int argc, char *argv[]) {
   asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_B);
 
   for (indexHilo = 0; indexHilo < cantidadHilos; indexHilo++) {
-    // NOTE: Posible solución: crear la estructura de tipo puntero
     infoHilos[indexHilo].indexHilo = indexHilo;
     infoHilos[indexHilo].cantidadHilos = cantidadHilos;
     infoHilos[indexHilo].columnas = columnas;
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
   // Hacer el join de los hilos
   for (indexHilo = 0; indexHilo < cantidadHilos; indexHilo++) {
     if (pthread_join(hilos[indexHilo], NULL)) {
-      printf("Hubo un error al crear el hilo\n");
+      printf("Hubo un error al hacer join en el hilo\n");
       exit(-1);
     }
   }
