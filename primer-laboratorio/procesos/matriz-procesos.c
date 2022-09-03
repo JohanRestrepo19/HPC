@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/mman.h>
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <time.h>
@@ -7,30 +8,22 @@
 
 int **MATRIZ_A, **MATRIZ_B, **RESULTADO;
 
-struct informacionProceso {
-  int filas, columnas, cantidadProcesos, indexProceso;
-};
+int **asignar_matriz_enteros_globalmente(int filas, int columnas) {
+  int fila, **doble_puntero_entero;
+  doble_puntero_entero =
+      (int **)mmap(NULL, filas * sizeof(int *), PROT_READ | PROT_WRITE,
+                   MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
-int **mallocArreglo2dEnteros(int filas, int columnas) {
-  int **doblePunteroEntero;
-  doblePunteroEntero = (int **)malloc(filas * sizeof(int *));
-
-  for (int fila = 0; fila < filas; fila++) {
-    doblePunteroEntero[fila] = (int *)malloc(columnas * sizeof(int));
+  for (fila = 0; fila < filas; fila++) {
+    doble_puntero_entero[fila] =
+        (int *)mmap(NULL, columnas * sizeof(int), PROT_READ | PROT_WRITE,
+                    MAP_SHARED | MAP_ANONYMOUS, -1, 0);
   }
 
-  return doblePunteroEntero;
+  return doble_puntero_entero;
 }
 
-void liberarArreglo2dEnteros(int **doblePunteroEntero, int filas,
-                             int columnas) {
-  for (int fila = 0; fila < filas; fila++) {
-    free(doblePunteroEntero[fila]);
-  }
-  free(doblePunteroEntero);
-}
-
-void asignarValoresAleatoriosMatriz(int filas, int columnas, int **matriz) {
+void asignar_valores_aleatorios_matriz(int filas, int columnas, int **matriz) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
       matriz[fila][columna] = (rand() % 1000) + 1;
@@ -38,7 +31,7 @@ void asignarValoresAleatoriosMatriz(int filas, int columnas, int **matriz) {
   }
 }
 
-void mostrarMatriz(int filas, int columnas, int **matriz) {
+void mostrar_matriz(int filas, int columnas, int **matriz) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
       printf("%d\t", matriz[fila][columna]);
@@ -48,36 +41,23 @@ void mostrarMatriz(int filas, int columnas, int **matriz) {
   printf("\n");
 }
 
-void multiplicarMatrices(struct informacionProceso infoProceso) {
-  int filas, columnas, cantidadProcesos, indexProceso, fila, columna, i, desde,
-      hasta;
-
-  // Recuperacion de la informacion que se manda encapsulada en el argumento
-  filas = infoProceso.filas;
-  columnas = infoProceso.columnas;
-  cantidadProcesos = infoProceso.cantidadProcesos;
-  indexProceso = infoProceso.indexProceso;
+void multiplicar_matrices(int filas, int columnas, int cant_procesos,
+                          int idx_proceso) {
+  int fila, columna, i, desde, hasta;
 
   // calculo de filas a trabajar por el proceso
-  desde = indexProceso * filas / cantidadProcesos;
-  hasta = (indexProceso + 1) * filas / cantidadProcesos;
-  printf("-----------------\n");
-  printf("indexProceso: %d\n", indexProceso);
-  printf("desde: %d\n", desde);
-  printf("hasta: %d\n", hasta);
-  printf("-----------------\n");
-
-  // Comprobar si el proceso está calculando bien sus valores correspondientes
+  desde = idx_proceso * filas / cant_procesos;
+  hasta = (idx_proceso + 1) * filas / cant_procesos;
 
   // Implementación de la funcion para multiplicar matrices
-  // for (fila = desde; fila < hasta; fila++) {
-  //   for (columna = 0; columna < columnas; columna++) {
-  //     RESULTADO[fila][columna] = 0;
-  //     for (i = 0; i < columnas; i++) {
-  //       RESULTADO[fila][columna] += MATRIZ_A[fila][i] * MATRIZ_B[i][columna];
-  //     }
-  //   }
-  // }
+  for (fila = desde; fila < hasta; fila++) {
+    for (columna = 0; columna < columnas; columna++) {
+      RESULTADO[fila][columna] = 0;
+      for (i = 0; i < columnas; i++) {
+        RESULTADO[fila][columna] += MATRIZ_A[fila][i] * MATRIZ_B[i][columna];
+      }
+    }
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -87,37 +67,49 @@ int main(int argc, char *argv[]) {
   struct timeval inicio, final;
   gettimeofday(&inicio, NULL);
 
-  int filas, columnas, cantidadProcesos, indexProceso;
-  struct informacionProceso infoProcesos[cantidadProcesos];
+  int filas, columnas, cant_procesos, idx_proceso, status;
+  pid_t pidC;
 
   // Obtencion de los parametros que se pasan en el llamado al ejecutable
   filas = atoi(argv[1]);
-  cantidadProcesos = atoi(argv[2]);
+  cant_procesos = atoi(argv[2]);
   columnas = filas; // Debido a que se está trabajando con matrices cuadradas
 
-  // Creacion de los hilos
-  for (indexProceso = 0; indexProceso < cantidadProcesos; indexProceso++) {
-    // TODO: Remover la estructura
-    //  infoProcesos[indexProceso].indexProceso = indexProceso;
-    //  infoProcesos[indexProceso].cantidadProcesos = cantidadProcesos;
-    //  infoProcesos[indexProceso].columnas = columnas;
-    //  infoProcesos[indexProceso].filas = filas;
+  MATRIZ_A = asignar_matriz_enteros_globalmente(filas, columnas);
+  MATRIZ_B = asignar_matriz_enteros_globalmente(filas, columnas);
+  RESULTADO = asignar_matriz_enteros_globalmente(filas, columnas);
 
-    // Actividad que realizan los procesos
-    pid_t pid = fork();
+  asignar_valores_aleatorios_matriz(filas, columnas, MATRIZ_A);
+  asignar_valores_aleatorios_matriz(filas, columnas, MATRIZ_B);
 
-    if (pid > 0) {
+  // Creacion de los procesos
+  for (idx_proceso = 0; idx_proceso < cant_procesos; idx_proceso++) {
+    pidC = fork();
+    if (pidC > 0)
       continue;
-    } else if (pid == 0) {
-      printf("Hola matriz soy hijo\n");
+    else if (pidC == 0) {
+      multiplicar_matrices(filas, columnas, cant_procesos, idx_proceso);
+      exit(0);
+    } else {
+      printf("Hubo un error creando el hilo\n");
     }
   }
 
-  // Este wait hace que el proceso padre espere a que todos los procesos hijos
-  // terminen antes de que se cierre el programa.
-  wait(NULL);
-  // for (indexProceso = 0; indexProceso < cantidadProcesos; indexProceso++) {
-  // }
+  // Esperar la ejecución de los procesos hijos
+  for (idx_proceso = 0; idx_proceso < cant_procesos; idx_proceso++) {
+    pidC = wait(&status);
+    // printf("PADRE de PID = %d, hijo de PID = %d terminado, st = %d \n",
+    //        getpid(), pidC, WEXITSTATUS(status));
+  }
 
+  // Tomar el tiempo de ejecución
+  gettimeofday(&final, NULL);
+  double tiempo_ejecucion;
+  tiempo_ejecucion =
+      (final.tv_sec - inicio.tv_sec) + 1e-6 * (final.tv_usec - inicio.tv_usec);
+
+  printf("Multiplicando matrices de %i x %i\n", filas, columnas);
+  printf("Tiempo de ejecución: %f\n", tiempo_ejecucion);
+  printf("\n");
   return 0;
 }
