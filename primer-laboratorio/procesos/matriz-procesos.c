@@ -98,8 +98,6 @@ int main(int argc, char *argv[]) {
   // Esperar la ejecución de los procesos hijos
   for (idx_proceso = 0; idx_proceso < cant_procesos; idx_proceso++) {
     pidC = wait(&status);
-    // printf("PADRE de PID = %d, hijo de PID = %d terminado, st = %d \n",
-    //        getpid(), pidC, WEXITSTATUS(status));
   }
 
   // Tomar el tiempo de ejecución

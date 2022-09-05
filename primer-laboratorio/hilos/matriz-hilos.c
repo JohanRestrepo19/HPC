@@ -6,30 +6,30 @@
 
 int **MATRIZ_A, **MATRIZ_B, **RESULTADO;
 
-struct informacionHilo {
-  int filas, columnas, cantidadHilos, indexHilo;
+struct informacion_hilo {
+  int filas, columnas, cant_hilos, idx_hilo;
 };
 
-int **mallocArreglo2dEnteros(int filas, int columnas) {
-  int **doblePunteroEntero;
-  doblePunteroEntero = (int **)malloc(filas * sizeof(int *));
+int **malloc_arreglo_2d_enteros(int filas, int columnas) {
+  int **doble_puntero_entero;
+  doble_puntero_entero = (int **)malloc(filas * sizeof(int *));
 
   for (int fila = 0; fila < filas; fila++) {
-    doblePunteroEntero[fila] = (int *)malloc(columnas * sizeof(int));
+    doble_puntero_entero[fila] = (int *)malloc(columnas * sizeof(int));
   }
 
-  return doblePunteroEntero;
+  return doble_puntero_entero;
 }
 
-void liberarArreglo2dEnteros(int **doblePunteroEntero, int filas,
-                             int columnas) {
+void liberar_arreglo_2d_enteros(int **doble_puntero_entero, int filas,
+                                int columnas) {
   for (int fila = 0; fila < filas; fila++) {
-    free(doblePunteroEntero[fila]);
+    free(doble_puntero_entero[fila]);
   }
-  free(doblePunteroEntero);
+  free(doble_puntero_entero);
 }
 
-void asignarValoresAleatoriosMatriz(int filas, int columnas, int **matriz) {
+void asignar_valores_aleatorios_matriz(int filas, int columnas, int **matriz) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
       matriz[fila][columna] = (rand() % 1000) + 1;
@@ -37,7 +37,7 @@ void asignarValoresAleatoriosMatriz(int filas, int columnas, int **matriz) {
   }
 }
 
-void mostrarMatriz(int filas, int columnas, int **matriz) {
+void mostrar_matriz(int filas, int columnas, int **matriz) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
       printf("%d\t", matriz[fila][columna]);
@@ -47,20 +47,20 @@ void mostrarMatriz(int filas, int columnas, int **matriz) {
   printf("\n");
 }
 
-void *multiplicarMatrices(void *threadarg) {
-  struct informacionHilo *infoHilo;
-  int filas, columnas, cantidadHilos, indexHilo, fila, columna, i, desde, hasta;
+void *multiplicar_matrices(void *threadarg) {
+  struct informacion_hilo *info_hilo;
+  int filas, columnas, cant_hilos, idx_hilo, fila, columna, i, desde, hasta;
 
   // Recuperación de la información que se manda encapsulada en el argumento
-  infoHilo = (struct informacionHilo *)threadarg;
-  filas = infoHilo->filas;
-  columnas = infoHilo->columnas;
-  cantidadHilos = infoHilo->cantidadHilos;
-  indexHilo = infoHilo->indexHilo;
+  info_hilo = (struct informacion_hilo *)threadarg;
+  filas = info_hilo->filas;
+  columnas = info_hilo->columnas;
+  cant_hilos = info_hilo->cant_hilos;
+  idx_hilo = info_hilo->idx_hilo;
 
   // calculo de filas a trabajar por el hilo
-  desde = indexHilo * filas / cantidadHilos;
-  hasta = (indexHilo + 1) * filas / cantidadHilos;
+  desde = idx_hilo * filas / cant_hilos;
+  hasta = (idx_hilo + 1) * filas / cant_hilos;
 
   // Implementación de la función de multiplicación
   for (fila = desde; fila < hasta; fila++) {
@@ -81,54 +81,54 @@ int main(int argc, char *argv[]) {
   struct timeval inicio, final;
   gettimeofday(&inicio, NULL);
 
-  int filas, columnas, cantidadHilos, indexHilo;
-  struct informacionHilo infoHilos[cantidadHilos];
-  pthread_t hilos[cantidadHilos];
+  int filas, columnas, cant_hilos, idx_hilo;
+  struct informacion_hilo infoHilos[cant_hilos];
+  pthread_t hilos[cant_hilos];
 
   filas = atoi(argv[1]);
-  cantidadHilos = atoi(argv[2]);
+  cant_hilos = atoi(argv[2]);
   columnas = filas;
 
-  MATRIZ_A = mallocArreglo2dEnteros(filas, columnas);
-  MATRIZ_B = mallocArreglo2dEnteros(filas, columnas);
-  RESULTADO = mallocArreglo2dEnteros(filas, columnas);
+  MATRIZ_A = malloc_arreglo_2d_enteros(filas, columnas);
+  MATRIZ_B = malloc_arreglo_2d_enteros(filas, columnas);
+  RESULTADO = malloc_arreglo_2d_enteros(filas, columnas);
 
-  asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_A);
-  asignarValoresAleatoriosMatriz(filas, columnas, MATRIZ_B);
+  asignar_valores_aleatorios_matriz(filas, columnas, MATRIZ_A);
+  asignar_valores_aleatorios_matriz(filas, columnas, MATRIZ_B);
 
-  for (indexHilo = 0; indexHilo < cantidadHilos; indexHilo++) {
-    infoHilos[indexHilo].indexHilo = indexHilo;
-    infoHilos[indexHilo].cantidadHilos = cantidadHilos;
-    infoHilos[indexHilo].columnas = columnas;
-    infoHilos[indexHilo].filas = filas;
+  for (idx_hilo = 0; idx_hilo < cant_hilos; idx_hilo++) {
+    infoHilos[idx_hilo].idx_hilo = idx_hilo;
+    infoHilos[idx_hilo].cant_hilos = cant_hilos;
+    infoHilos[idx_hilo].columnas = columnas;
+    infoHilos[idx_hilo].filas = filas;
 
-    if (pthread_create(&hilos[indexHilo], NULL, multiplicarMatrices,
-                       (void *)&infoHilos[indexHilo]) != 0) {
+    if (pthread_create(&hilos[idx_hilo], NULL, multiplicar_matrices,
+                       (void *)&infoHilos[idx_hilo]) != 0) {
       printf("Hubo un error al crear el hilo\n");
       exit(-1);
     }
   }
 
   // Hacer el join de los hilos
-  for (indexHilo = 0; indexHilo < cantidadHilos; indexHilo++) {
-    if (pthread_join(hilos[indexHilo], NULL)) {
+  for (idx_hilo = 0; idx_hilo < cant_hilos; idx_hilo++) {
+    if (pthread_join(hilos[idx_hilo], NULL)) {
       printf("Hubo un error al hacer join en el hilo\n");
       exit(-1);
     }
   }
 
   // Liberar la memoria
-  liberarArreglo2dEnteros(MATRIZ_A, filas, columnas);
-  liberarArreglo2dEnteros(MATRIZ_B, filas, columnas);
-  liberarArreglo2dEnteros(RESULTADO, filas, columnas);
+  liberar_arreglo_2d_enteros(MATRIZ_A, filas, columnas);
+  liberar_arreglo_2d_enteros(MATRIZ_B, filas, columnas);
+  liberar_arreglo_2d_enteros(RESULTADO, filas, columnas);
 
   // Tomar el tiempo de ejecución
   gettimeofday(&final, NULL);
-  double tiempoEjecucion;
-  tiempoEjecucion =
+  double tiempo_ejecucion;
+  tiempo_ejecucion =
       (final.tv_sec - inicio.tv_sec) + 1e-6 * (final.tv_usec - inicio.tv_usec);
 
   printf("Multiplicando matrices de %i x %i\n", filas, columnas);
-  printf("Tiempo de ejecución: %f\n", tiempoEjecucion);
+  printf("Tiempo de ejecución: %f\n", tiempo_ejecucion);
   printf("\n");
 }
