@@ -57,19 +57,19 @@ int main(int argc, char *argv[]) {
   double tiempo_ejecucion = 0.0;
   clock_t inicio = clock();
 
-  int filas, **matrizA, **matrizB, **resultado;
+  int filas, **matriz_a, **matriz_b, **resultado;
   filas = atoi(argv[1]);
 
-  matrizA = malloc_arreglo_2d_enteros(filas, filas);
-  matrizB = malloc_arreglo_2d_enteros(filas, filas);
+  matriz_a = malloc_arreglo_2d_enteros(filas, filas);
+  matriz_b = malloc_arreglo_2d_enteros(filas, filas);
   resultado = malloc_arreglo_2d_enteros(filas, filas);
 
-  asignar_valores_aleatorios_matriz(filas, filas, matrizA);
-  asignar_valores_aleatorios_matriz(filas, filas, matrizB);
-  multiplicar_matrices(filas, filas, matrizA, matrizB, resultado);
+  asignar_valores_aleatorios_matriz(filas, filas, matriz_a);
+  asignar_valores_aleatorios_matriz(filas, filas, matriz_b);
+  multiplicar_matrices(filas, filas, matriz_a, matriz_b, resultado);
 
-  liberar_arreglo_2d_enteros(matrizA, filas, filas);
-  liberar_arreglo_2d_enteros(matrizB, filas, filas);
+  liberar_arreglo_2d_enteros(matriz_a, filas, filas);
+  liberar_arreglo_2d_enteros(matriz_b, filas, filas);
   liberar_arreglo_2d_enteros(resultado, filas, filas);
 
   clock_t final = clock();
