@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
   gettimeofday(&inicio, NULL);
 
   int filas, columnas, cant_hilos, idx_hilo;
-  struct informacion_hilo infoHilos[cant_hilos];
+  struct informacion_hilo info_hilos[cant_hilos];
   pthread_t hilos[cant_hilos];
 
   filas = atoi(argv[1]);
@@ -97,13 +97,13 @@ int main(int argc, char *argv[]) {
   asignar_valores_aleatorios_matriz(filas, columnas, MATRIZ_B);
 
   for (idx_hilo = 0; idx_hilo < cant_hilos; idx_hilo++) {
-    infoHilos[idx_hilo].idx_hilo = idx_hilo;
-    infoHilos[idx_hilo].cant_hilos = cant_hilos;
-    infoHilos[idx_hilo].columnas = columnas;
-    infoHilos[idx_hilo].filas = filas;
+    info_hilos[idx_hilo].idx_hilo = idx_hilo;
+    info_hilos[idx_hilo].cant_hilos = cant_hilos;
+    info_hilos[idx_hilo].columnas = columnas;
+    info_hilos[idx_hilo].filas = filas;
 
     if (pthread_create(&hilos[idx_hilo], NULL, multiplicar_matrices,
-                       (void *)&infoHilos[idx_hilo]) != 0) {
+                       (void *)&info_hilos[idx_hilo]) != 0) {
       printf("Hubo un error al crear el hilo\n");
       exit(-1);
     }
