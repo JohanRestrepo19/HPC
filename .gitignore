@@ -1,3 +1,7 @@
+# Sheets
+*.ods
+*.csv
+
 # Prerequisites
 *.d
 
