@@ -8,7 +8,8 @@
 double *u, *f, *utmp;
 
 struct thread_info {
-  int from, to, h2;
+  int from, to;
+  double h2;
 };
 
 /* --
@@ -23,7 +24,8 @@ struct thread_info {
 
 void *thread_subroutine(void *threadarg) {
   struct thread_info *thread_info;
-  int h2, from, to, i;
+  int from, to, i;
+  double h2;
 
   thread_info = (struct thread_info *)threadarg;
   h2 = thread_info->h2;
