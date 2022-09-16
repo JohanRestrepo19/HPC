@@ -1,4 +1,3 @@
-
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -92,7 +91,6 @@ void write_solution(int n, double *u, const char *fname) {
 
 int main(int argc, char **argv) {
   int i, n, nsteps, threads_ammount;
-  // double *u, *f, h;
   double h;
   char *fname;
   struct timeval tstart, tend;
@@ -116,7 +114,6 @@ int main(int argc, char **argv) {
 
   /* Run the solver */
   gettimeofday(&tstart, NULL);
-  // jacobi(nsteps, n, u, f);
   jacobi(nsteps, n, threads_ammount);
   gettimeofday(&tend, NULL);
 
@@ -127,7 +124,7 @@ int main(int argc, char **argv) {
   printf("n: %d\n"
          "nsteps: %d\n"
          "threads_ammount: %d\n"
-         "Elapsed time: %f s\n",
+         "Elapsed time in seconds: %f\n",
          n, nsteps, threads_ammount, exec_time);
 
   /* Write the results */
