@@ -62,6 +62,7 @@ int main(int argc, char **argv) {
   u = (double *)malloc((n + 1) * sizeof(double));
   f = (double *)malloc((n + 1) * sizeof(double));
 
+  // TODO: Posible integración de valores aleatorios
   memset(u, 0, (n + 1) * sizeof(double));
 
   for (i = 0; i <= n; ++i)
