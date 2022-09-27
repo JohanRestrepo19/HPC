@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
 
 int **malloc_arreglo_2d_enteros(int filas, int columnas) {
@@ -46,7 +47,7 @@ void multiplicar_matrices(int filas, int columnas, int **matrizA, int **matrizB,
     for (int columna = 0; columna < columnas; columna++) {
       resultado[fila][columna] = 0;
       for (int i = 0; i < columnas; i++) {
-        resultado[fila][columna] += matrizA[fila][i] * matrizB[i][columna];
+        resultado[fila][columna] += matrizA[fila][i] * matrizB[columna][i];
       }
     }
   }
@@ -54,8 +55,9 @@ void multiplicar_matrices(int filas, int columnas, int **matrizA, int **matrizB,
 
 int main(int argc, char *argv[]) {
   srand(time(0));
-  double tiempo_ejecucion = 0.0;
-  clock_t inicio = clock();
+  struct timeval inicio, final;
+
+  gettimeofday(&inicio, NULL);
 
   int filas, **matriz_a, **matriz_b, **resultado;
   filas = atoi(argv[1]);
@@ -72,9 +74,11 @@ int main(int argc, char *argv[]) {
   liberar_arreglo_2d_enteros(matriz_b, filas, filas);
   liberar_arreglo_2d_enteros(resultado, filas, filas);
 
-  clock_t final = clock();
+  gettimeofday(&final, NULL);
 
-  tiempo_ejecucion = (double)(final - inicio) / CLOCKS_PER_SEC;
+  double tiempo_ejecucion;
+  tiempo_ejecucion =
+      (final.tv_sec - inicio.tv_sec) + 1e-6 * (final.tv_usec - inicio.tv_usec);
 
   printf("Multiplicando matrices de %i x %i\n", filas, filas);
   printf("Tiempo de ejecución: %f\n", tiempo_ejecucion);
