@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 
   int filas;
   filas = atoi(argv[1]);
-  CANT_HILOS = atoi(argv[2]);
+  CANT_HILOS = (argc > 2) ? atoi(argv[2]) : 8;
 
   MATRIZ_A = malloc_arreglo_2d_enteros(filas, filas);
   MATRIZ_B = malloc_arreglo_2d_enteros(filas, filas);
