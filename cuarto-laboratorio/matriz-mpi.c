@@ -89,6 +89,10 @@ int main(int argc, char *argv[]) {
   multiplicar_matrices(filas, columnas, cant_procesos, idx_proceso);
   MPI_Finalize();
 
+  mostrar_matriz(filas, columnas, MATRIZ_A);
+  mostrar_matriz(filas, columnas, MATRIZ_B);
+  mostrar_matriz(filas, columnas, RESULTADO);
+
   // Tomar el tiempo de ejecución
   gettimeofday(&final, NULL);
   double tiempo_ejecucion;
