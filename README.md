@@ -8,3 +8,7 @@ A continuación veremos el uso del HPC (High Performance Computing) en diferente
 - Lenguaje C.
 
 Se usa lenguaje C, al ser un lenguaje compilado, muestra rendimientos mucho mejores al hacer uso de los componentes físicos de la máquina.
+
+## Primer laboratorio
+
+- Descripción.
