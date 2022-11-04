@@ -28,7 +28,7 @@ void liberar_arreglo_2d_enteros(int **doble_puntero_entero, int filas,
 void asignar_valores_aleatorios_matriz(int filas, int columnas, int **matriz) {
   for (int fila = 0; fila < filas; fila++) {
     for (int columna = 0; columna < columnas; columna++) {
-      matriz[fila][columna] = (rand() % 1000) + 1;
+      matriz[fila][columna] = (rand() % 3) + 1;
     }
   }
 }
@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &cant_procesos);
   MPI_Comm_rank(MPI_COMM_WORLD, &idx_proceso);
   multiplicar_matrices(filas, columnas, cant_procesos, idx_proceso);
+  MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
 
   mostrar_matriz(filas, columnas, MATRIZ_A);
