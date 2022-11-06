@@ -41,18 +41,16 @@ int main(int argc, char *argv[]) {
   // Semilla para la generacion de numeros aleatorios
   srand(time(0));
   int filas, columnas, idx_proceso, cant_procesos;
-  int i, j, sum = 0;
-  int cant_elemen_por_proceso;
-  int *matriz_a, *matriz_b, *resultado;
+  int fila, columna, k, sum;
+  int cant_elemen_por_proceso, cant_filas_por_proceso;
+  int *matriz_b;
 
   // Obtencion de los parametros que se pasan en el llamado al ejecutable
   filas = atoi(argv[1]);
   columnas = filas;
 
-  matriz_a = malloc_arreglo_1d_enteros(filas, columnas);
   matriz_b = malloc_arreglo_1d_enteros(filas, columnas);
-  resultado = malloc_arreglo_1d_enteros(filas, columnas);
-  asignar_valores_aleatorios_arreglo(filas, columnas, matriz_a);
+
   asignar_valores_aleatorios_arreglo(filas, columnas, matriz_b);
 
   MPI_Init(&argc, &argv);
@@ -61,28 +59,60 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &idx_proceso);
 
   cant_elemen_por_proceso = filas * columnas / cant_procesos;
+  cant_filas_por_proceso = filas / cant_procesos;
+
+  int *matriz_a;
+  int *resultado;
 
   if (idx_proceso == 0) {
-    printf("Matriz a desde proceso 0:\n");
-    mostrar_arreglo_como_matriz(filas, columnas, matriz_a);
-  }
+    matriz_a = malloc_arreglo_1d_enteros(filas, columnas);
+    asignar_valores_aleatorios_arreglo(filas, columnas, matriz_a);
 
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  if (idx_proceso == 1) {
-    printf("Matriz b desde proceso 1:\n");
-    mostrar_arreglo_como_matriz(filas, columnas, matriz_b);
+    resultado = malloc_arreglo_1d_enteros(filas, columnas);
   }
 
   int *matriz_a_temp = malloc(cant_elemen_por_proceso * sizeof(int));
+  int *resultado_temp = malloc(cant_elemen_por_proceso * sizeof(int));
 
   MPI_Scatter(matriz_a, cant_elemen_por_proceso, MPI_INT, matriz_a_temp,
               cant_elemen_por_proceso, MPI_INT, 0, MPI_COMM_WORLD);
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  printf("El procesos %d recibió los siguientes elementos: ", idx_proceso);
-  mostrar_arreglo((filas * columnas / cant_procesos), matriz_a_temp);
+  // Implementación de la multiplicación de la matriz
+  for (fila = 0; fila < cant_filas_por_proceso; fila++) {
+    for (columna = 0; columna < columnas; columna++) {
+      resultado_temp[fila * columnas + columna] = 0;
+      for (k = 0; k < columnas; k++) {
+        resultado_temp[fila * columnas + columna] +=
+            matriz_a_temp[fila * columnas + k] *
+            matriz_b[k * cant_filas_por_proceso + columna];
+      }
+    }
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  MPI_Gather(resultado_temp, cant_elemen_por_proceso, MPI_INT, resultado,
+             cant_elemen_por_proceso, MPI_INT, 0, MPI_COMM_WORLD);
+
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  if (idx_proceso == 0) {
+    printf("Matriz A: \n");
+    mostrar_arreglo_como_matriz(filas, columnas, matriz_a);
+    printf("Matriz B: \n");
+    mostrar_arreglo_como_matriz(filas, columnas, matriz_b);
+    printf("Matriz Resultado: \n");
+    mostrar_arreglo_como_matriz(filas, columnas, resultado);
+
+    free(matriz_a);
+    free(matriz_b);
+    free(resultado);
+    free(matriz_a_temp);
+    free(resultado_temp);
+  }
+
   MPI_Finalize();
 
   return 0;
