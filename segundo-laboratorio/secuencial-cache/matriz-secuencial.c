@@ -40,8 +40,6 @@ void mostrar_matriz(int filas, int columnas, int **matriz) {
   printf("\n");
 }
 
-// TODO: Mejorar el nombre de las variables para que tenga mas sentido
-// semantico.
 void multiplicar_matrices(int filas, int columnas, int **matrizA, int **matrizB,
                           int **resultado) {
 

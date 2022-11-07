@@ -106,7 +106,6 @@ int main(int argc, char **argv) {
   utmp = (double *)mmap(NULL, (n + 1) * sizeof(double), PROT_READ | PROT_WRITE,
                         MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
-  // TODO: Posible integración con valores aleatorios
   memset(u, 0, (n + 1) * sizeof(double));
 
   for (i = 0; i <= n; ++i)

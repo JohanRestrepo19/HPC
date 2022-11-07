@@ -52,6 +52,9 @@ int main(int argc, char *argv[]) {
 
   asignar_valores_aleatorios_arreglo(filas, columnas, matriz_b);
 
+  // TODO: Tomar el tiempo de ejecución de MPI utilizando la funcion
+  // correspondiente.
+
   MPI_Init(&argc, &argv);
 
   MPI_Comm_size(MPI_COMM_WORLD, &cant_procesos);
