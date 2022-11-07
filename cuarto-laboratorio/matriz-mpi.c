@@ -12,7 +12,7 @@ int *malloc_arreglo_1d_enteros(int filas, int columnas) {
 
 void asignar_valores_aleatorios_arreglo(int filas, int columnas, int *matriz) {
   for (int idx = 0; idx < filas * columnas; idx++) {
-    matriz[idx] = (rand() % 3) + 1;
+    matriz[idx] = (rand() % 1000) + 1;
   }
 }
 
@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
   int filas, columnas, idx_proceso, cant_procesos;
   int cant_elemen_por_proceso, cant_filas_por_proceso;
   int *matriz_b;
+  double tiempo_inicio, tiempo_final;
 
   // Obtencion de los parametros que se pasan en el llamado al ejecutable
   filas = atoi(argv[1]);
@@ -52,13 +53,13 @@ int main(int argc, char *argv[]) {
 
   asignar_valores_aleatorios_arreglo(filas, columnas, matriz_b);
 
-  // TODO: Tomar el tiempo de ejecución de MPI utilizando la funcion
-  // correspondiente.
-
   MPI_Init(&argc, &argv);
 
   MPI_Comm_size(MPI_COMM_WORLD, &cant_procesos);
   MPI_Comm_rank(MPI_COMM_WORLD, &idx_proceso);
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  tiempo_inicio = MPI_Wtime();
 
   cant_elemen_por_proceso = filas * columnas / cant_procesos;
   cant_filas_por_proceso = filas / cant_procesos;
@@ -98,14 +99,11 @@ int main(int argc, char *argv[]) {
              cant_elemen_por_proceso, MPI_INT, 0, MPI_COMM_WORLD);
 
   MPI_Barrier(MPI_COMM_WORLD);
+  tiempo_final = MPI_Wtime();
 
   if (idx_proceso == 0) {
-    printf("Matriz A: \n");
-    mostrar_arreglo_como_matriz(filas, columnas, matriz_a);
-    printf("Matriz B: \n");
-    mostrar_arreglo_como_matriz(filas, columnas, matriz_b);
-    printf("Matriz Resultado: \n");
-    mostrar_arreglo_como_matriz(filas, columnas, resultado);
+    printf("Multiplicando matrices de %i x %i\n", filas, filas);
+    printf("Tiempo de ejecución: %f\n", tiempo_final - tiempo_inicio);
 
     free(matriz_a);
     free(matriz_b);
