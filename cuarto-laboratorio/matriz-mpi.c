@@ -41,7 +41,6 @@ int main(int argc, char *argv[]) {
   // Semilla para la generacion de numeros aleatorios
   srand(time(0));
   int filas, columnas, idx_proceso, cant_procesos;
-  int fila, columna, k, sum;
   int cant_elemen_por_proceso, cant_filas_por_proceso;
   int *matriz_b;
 
@@ -80,13 +79,12 @@ int main(int argc, char *argv[]) {
   MPI_Barrier(MPI_COMM_WORLD);
 
   // Implementación de la multiplicación de la matriz
-  for (fila = 0; fila < cant_filas_por_proceso; fila++) {
-    for (columna = 0; columna < columnas; columna++) {
+  for (int fila = 0; fila < cant_filas_por_proceso; fila++) {
+    for (int columna = 0; columna < columnas; columna++) {
       resultado_temp[fila * columnas + columna] = 0;
-      for (k = 0; k < columnas; k++) {
+      for (int k = 0; k < columnas; k++) {
         resultado_temp[fila * columnas + columna] +=
-            matriz_a_temp[fila * columnas + k] *
-            matriz_b[k * cant_filas_por_proceso + columna];
+            matriz_a_temp[fila * columnas + k] * matriz_b[k * filas + columna];
       }
     }
   }
